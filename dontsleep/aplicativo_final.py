@@ -1,5 +1,35 @@
 import cv2
 import mediapipe as mp
+import numpy as np
+# Entender as coordenadas do MediaPipe
+# Entender a normalização e desnormalização do pontos do MediaPipe
+# Analisar os olhos (seguindo o artigo)
+# ponto dos olhos
+# FIXME:Olho esquerdo
+p_olho_esq = [385, 380, 387, 373, 362, 263]
+# FIXME:Olho direito
+p_olho_dir = [160, 144, 158, 153, 33, 133]
+
+#Função EAR
+def calculo_ear(face, p_olho_dir, p_olho_esq):
+    try:
+        face = np.array([[coord.x, coord.y] for coord in face])
+        face_esq = face[p_olho_esq, :]
+        face_dir = face[p_olho_dir, :]
+
+        ear_esq = (np.linalg.norm(face_esq[0] - face_esq[1]) + np.linalg.norm(face_esq[2] - face_esq[3])) / (2 * (np.linalg.norm(face_esq[4] - face_esq[5])))
+        ear_dir = (np.linalg.norm(face_dir[0] - face_dir[1]) + np.linalg.norm(face_dir[2] - face_dir[3])) / (2 * (np.linalg.norm(face_dir[4] - face_dir[5])))
+    except:
+        ear_esq = 0.0
+        ear_dir = 0.0
+    media_ear = (ear_esq + ear_dir) / 2
+    
+    return media_ear
+
+  
+  
+
+
 
 cap = cv2.VideoCapture(0)
 
@@ -13,6 +43,7 @@ cap = cv2.VideoCapture(0)
 # Primeiro, vamos importar a solução de desenho, 
 # para observarmos os pontos na nossa face que o MediaPipe coleta.
 # Para isso, precisamos fazer:
+
 mp_drawing = mp.solutions.drawing_utils
 
 #Ainda falta coletar a solução do Face Mesh.
@@ -37,6 +68,7 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
       # vamos mostrar essa detecção que o mediapipe fez
       # face_landmars - coordenadas da nossa face
       # percorrendo nosso processamento
+      #FIXME: acesso as coordenadas (multi_face_landmarks)
       try:
           for face_landmarks in saida_facemesh.multi_face_landmarks:
              """
