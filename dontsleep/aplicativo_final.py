@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import time
 # Entender as coordenadas do MediaPipe
 # Entender a normalização e desnormalização do pontos do MediaPipe
 # Analisar os olhos (seguindo o artigo)
@@ -27,6 +28,8 @@ def calculo_ear(face, p_olho_dir, p_olho_esq):
     media_ear = (ear_esq + ear_dir) / 2
     
     return media_ear
+limiar = 0.31 
+
 cap = cv2.VideoCapture(0)
 
 # vamos importar soluções
@@ -52,7 +55,7 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
       if not sucesso:
         print('Ignorando o frame vazio da câmera.')
         continue
-      comprimento = largura, _ =frame.shape
+      comprimento ,largura,_=frame.shape
       # transformando de BGR para RGB
       frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
       # variável que vai receber os dados processados do meu frame, como os pontos do meu rosto etc. 
@@ -100,7 +103,22 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
              cv2.putText(frame, f"EAR: {round(ear, 2)}", (1, 24),
                                 cv2.FONT_HERSHEY_DUPLEX,
                                 0.9, (255, 255, 255), 2)
-
+             if ear < limiar:
+               t_inicial = time.time() if dormindo == 0 else t_inicial
+               dormindo = 1
+             if dormindo ==1 and ear >= limiar:
+               dormindo = 0
+             t_final = time.time()
+             tempo = (t_final-t_inicial) if dormindo == 1 else 0.0
+             
+             cv2.putText(frame, f"Tempo: {round(ear, 2)}", (1, 24),
+                                cv2.FONT_HERSHEY_DUPLEX,
+                                0.9, (255, 255, 255), 2)
+             if tempo >= 1.5:
+               cv2.rectangle(frame, (0,1),(290,140),(58,58,55),-1)
+               cv2.putText(frame, f"Muito tempo com os olhos fechados!: {round(ear, 2)}", (1, 24),
+                                cv2.FONT_HERSHEY_DUPLEX,
+                                0.9, (255, 255, 255), 2)
       except Exception as e:
          print(e)
        
