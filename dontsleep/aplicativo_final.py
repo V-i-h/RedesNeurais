@@ -27,12 +27,6 @@ def calculo_ear(face, p_olho_dir, p_olho_esq):
     media_ear = (ear_esq + ear_dir) / 2
     
     return media_ear
-
-  
-  
-
-
-
 cap = cv2.VideoCapture(0)
 
 # vamos importar soluções
@@ -58,7 +52,7 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
       if not sucesso:
         print('Ignorando o frame vazio da câmera.')
         continue
-      comprimento = largura,_=frame.shape
+      comprimento = largura, _ =frame.shape
       # transformando de BGR para RGB
       frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
       # variável que vai receber os dados processados do meu frame, como os pontos do meu rosto etc. 
@@ -98,7 +92,15 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
                  coord_cv=mp_drawing._normalized_to_pixel_coordinates(coord_xyz.x,coord_xyz.y,largura,comprimento)
                  cv2.circle(frame,coord_cv,2,(255,0,0),-1)
              #FIXME: Chamada do EAR e print
-             
+             ear = calculo_ear(face,p_olho_dir,p_olho_esq)
+             # mostrando o EAR na tela
+             # Criando um retangulo cinza sólido(-1)
+             cv2.rectangle(frame, (0,1),(290,140),(58,58,55),-1)
+             #mostro os valores no frame
+             cv2.putText(frame, f"EAR: {round(ear, 2)}", (1, 24),
+                                cv2.FONT_HERSHEY_DUPLEX,
+                                0.9, (255, 255, 255), 2)
+
       except Exception as e:
          print(e)
        
