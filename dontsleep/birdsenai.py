@@ -112,7 +112,7 @@ with mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence
 
                 # Chamada do MAR e print
                 mar = calculo_mar(face, p_boca)
-                cv2.putText(frame, f"MAR: {round(mar, 2)} { 'abertos' if mar >= mar_limiar else  'fechados '}", (1, 50),
+                cv2.putText(frame, f"MAR: {round(mar, 2)} {'aberto' if mar >= mar_limiar else  'fechado' }", (1, 50),
                             cv2.FONT_HERSHEY_DUPLEX,
                             0.9, (255, 255, 255), 2)
 
